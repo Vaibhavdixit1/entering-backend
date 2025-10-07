@@ -16,7 +16,7 @@ This project is created by someone transitioning from frontend development to ba
 
 1. Clone the repository
 ```bash
-git clone <your-repo-url>
+git clone <https://github.com/Vaibhavdixit1/entering-backend>
 cd entering-backend
 ```
 
