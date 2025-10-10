@@ -1,6 +1,21 @@
 const express = require("express");
 const app = express();
 
+// Enable CORS for frontend communication
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
+// Parse JSON bodies
+app.use(express.json());
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -36,17 +51,6 @@ app.get("/facts", (req, res) => {
     "The shortest war in history was between Britain and Zanzibar on August 27, 1896. Zanzibar surrendered after 38 minutes.",
   ];
   res.json({ facts: facts });
-});
-
-app.get("/weather", (req, res) => {
-  const weather = {
-    location: "New York",
-    temperature: "22°C",
-    condition: "Sunny",
-    humidity: "65%",
-    windSpeed: "10 km/h",
-  };
-  res.json({ weather: weather });
 });
 
 const PORT = process.env.PORT || 3000;

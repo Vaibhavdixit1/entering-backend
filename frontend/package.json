@@ -1,12 +1,14 @@
 {
-  "name": "frontend",
+  "name": "entering-frontend",
   "version": "0.1.0",
   "private": true,
+  "description": "Frontend application for entering project",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "install-deps": "npm install"
   },
   "dependencies": {
     "react": "19.1.0",
@@ -19,5 +21,8 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "@eslint/eslintrc": "^3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
