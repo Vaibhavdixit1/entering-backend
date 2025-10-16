@@ -1,5 +1,76 @@
 const express = require("express");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 const app = express();
+
+// Swagger configuration
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Entering Backend API",
+      version: "1.0.0",
+      description: "A comprehensive API for jokes, quotes, and facts with rate limiting and health monitoring",
+      contact: {
+        name: "Vaibhav Dixit",
+        email: "vaibhav@videosdk.live"
+      }
+    },
+    servers: [
+      {
+        url: "http://localhost:3000",
+        description: "Development server"
+      }
+    ],
+    components: {
+      schemas: {
+        Joke: {
+          type: "object",
+          properties: {
+            jokes: {
+              type: "array",
+              items: { type: "string" }
+            },
+            total: { type: "number" },
+            returned: { type: "number" }
+          }
+        },
+        Quote: {
+          type: "object",
+          properties: {
+            quotes: {
+              type: "array",
+              items: { type: "string" }
+            }
+          }
+        },
+        Fact: {
+          type: "object",
+          properties: {
+            facts: {
+              type: "array",
+              items: { type: "string" }
+            }
+          }
+        },
+        Health: {
+          type: "object",
+          properties: {
+            status: { type: "string" },
+            timestamp: { type: "string" },
+            uptime: { type: "number" },
+            memory: { type: "object" },
+            version: { type: "string" }
+          }
+        }
+      }
+    }
+  },
+  apis: ["./index.js"]
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Simple rate limiting middleware
 const rateLimit = (() => {
@@ -62,6 +133,27 @@ app.use((req, res, next) => {
 // Parse JSON bodies
 app.use(express.json());
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Get API welcome message
+ *     description: Returns a welcome message with timestamp and version
+ *     responses:
+ *       200:
+ *         description: Welcome message
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 timestamp:
+ *                   type: string
+ *                 version:
+ *                   type: string
+ */
 app.get("/", (req, res) => {
   res.json({ 
     message: "Hello World!",
@@ -70,6 +162,30 @@ app.get("/", (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /jokes:
+ *   get:
+ *     summary: Get jokes
+ *     description: Returns a collection of jokes with optional limit
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 10
+ *         description: Number of jokes to return (default: all)
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved jokes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Joke'
+ *       500:
+ *         description: Server error
+ */
 app.get("/jokes", (req, res) => {
   try {
     const jokes = [
@@ -116,6 +232,20 @@ app.get("/facts", (req, res) => {
   res.json({ facts: facts });
 });
 
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     description: Returns server health status and system metrics
+ *     responses:
+ *       200:
+ *         description: Server health status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Health'
+ */
 // Add health check endpoint
 app.get("/health", (req, res) => {
   res.json({
