@@ -1,0 +1,20 @@
+{
+  "name": "entering-backend-fullstack",
+  "version": "1.0.0",
+  "description": "Full-stack application with Express.js backend and Next.js frontend",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:start": "cd backend && npm start",
+    "frontend:dev": "cd frontend && npm run dev -- --port 3001",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:start": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["express", "nextjs", "fullstack", "api"],
+  "author": "vaibhav",
+  "license": "ISC"
+}

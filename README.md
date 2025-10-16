@@ -1,45 +1,71 @@
-# Entering Backend
+# Entering Project
 
-A simple Express.js backend API with multiple endpoints for jokes, quotes, facts, and weather data.
+A full-stack application with separate backend and frontend projects that can be run independently.
 
 ## 🎯 About the Developer
 
-This project is created by someone transitioning from frontend development to backend development. This is the first step to backend 
+This project is created by someone transitioning from frontend development to backend development. This is the first step to backend development with a complete full-stack setup.
 
-## 🚀 Getting Started
+## 🏗️ Project Structure
 
-### Prerequisites
-- Node.js (v14 or higher)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository
-```bash
-git clone https://github.com/Vaibhavdixit1/entering-backend
-cd entering-backend
+```
+entering-backend/
+├── backend/          # Backend API server (Node.js/Express)
+├── frontend/         # Frontend application (Next.js/React)
+└── README.md         # This file
 ```
 
-2. Install dependencies
+## 🚀 Quick Start
+
+### Option 1: Run Backend and Frontend Separately
+
+#### Backend Server
 ```bash
+cd backend
 npm install
+npm start
 ```
+Backend will run on http://localhost:3000
 
-3. Start the server
+#### Frontend Application
 ```bash
+cd frontend
+npm install
+npm run dev
+```
+Frontend will run on http://localhost:3001
+
+### Option 2: Run in Different Terminals
+
+**Terminal 1 (Backend):**
+```bash
+cd backend
+npm install
 npm start
 ```
 
-The server will start on `http://localhost:3000` (or the port specified in your environment variables).
+**Terminal 2 (Frontend):**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## 📚 Individual Project Documentation
+
+- [Backend README](./backend/README.md) - Backend API server documentation
+- [Frontend README](./frontend/README.md) - Frontend application documentation
+
+## 🔧 Development Workflow
+
+1. Start the backend server first (required for frontend API calls)
+2. Start the frontend development server
+3. Access the application at http://localhost:3001
+4. Backend API is available at http://localhost:3000
 
 ## 📚 API Endpoints
 
-### Base URL
-```
-http://localhost:3000
-```
-
-### Available Endpoints
+The backend provides the following endpoints:
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -51,37 +77,15 @@ http://localhost:3000
 
 ## 🛠️ Technologies Used
 
+### Backend
 - **Node.js** - JavaScript runtime
 - **Express.js** - Web framework for Node.js
 - **dotenv** - Environment variable management
 
-## 📁 Project Structure
-
-```
-entering-backend/
-├── index.js          # Main server file
-├── package.json      # Project dependencies and scripts
-├── package-lock.json # Dependency lock file
-└── README.md         # This file
-```
-
-## 🔧 Development
-
-### Available Scripts
-
-- `npm start` - Start the server
-- `node index.js` - Alternative way to start the server
-
-### Environment Variables
-
-You can set the following environment variables:
-
-- `PORT` - Server port (default: 3000)
-
-Example:
-```bash
-PORT=8080 npm start
-```
+### Frontend
+- **Next.js 15** - React framework
+- **React 19** - UI library
+- **Tailwind CSS** - Styling framework
 
 ## 📝 License
 
