@@ -175,7 +175,7 @@ app.get("/", (req, res) => {
  *           type: integer
  *           minimum: 1
  *           maximum: 10
- *         description: Number of jokes to return (default: all)
+ *         description: "Number of jokes to return (default: all)"
  *     responses:
  *       200:
  *         description: Successfully retrieved jokes
@@ -264,7 +264,7 @@ app.use((err, req, res, next) => {
 });
 
 // Add 404 handler
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
