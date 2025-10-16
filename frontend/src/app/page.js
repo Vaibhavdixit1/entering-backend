@@ -11,6 +11,7 @@ export default function Home() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,24 +19,30 @@ export default function Home() {
         setLoading(true);
         setError(null);
 
-        // Fetch all data from API endpoints
-        const [jokesRes, quotesRes, factsRes, weatherRes] = await Promise.all([
-          fetch("http://localhost:3000/jokes"),
-          fetch("http://localhost:3000/quotes"),
-          fetch("http://localhost:3000/facts"),
+        // Fetch all data from API endpoints with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        const [jokesRes, quotesRes, factsRes] = await Promise.all([
+          fetch("http://localhost:3000/jokes?limit=3", { signal: controller.signal }),
+          fetch("http://localhost:3000/quotes", { signal: controller.signal }),
+          fetch("http://localhost:3000/facts", { signal: controller.signal }),
         ]);
+        
+        clearTimeout(timeoutId);
 
-        const [jokes, quotes, facts, weather] = await Promise.all([
+        const [jokes, quotes, facts] = await Promise.all([
           jokesRes.json(),
           quotesRes.json(),
           factsRes.json(),
         ]);
 
         setData({
-          jokes: jokes.jokes,
-          quotes: quotes.quotes,
-          facts: facts.facts,
+          jokes: jokes.jokes || [],
+          quotes: quotes.quotes || [],
+          facts: facts.facts || [],
         });
+        setLastUpdated(new Date().toLocaleTimeString());
       } catch (err) {
         setError("Failed to fetch data from API");
         console.error("Error fetching data:", err);
@@ -46,6 +53,45 @@ export default function Home() {
 
     fetchData();
   }, []);
+
+  const handleRefresh = () => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const [jokesRes, quotesRes, factsRes] = await Promise.all([
+          fetch("http://localhost:3000/jokes?limit=3", { signal: controller.signal }),
+          fetch("http://localhost:3000/quotes", { signal: controller.signal }),
+          fetch("http://localhost:3000/facts", { signal: controller.signal }),
+        ]);
+        
+        clearTimeout(timeoutId);
+
+        const [jokes, quotes, facts] = await Promise.all([
+          jokesRes.json(),
+          quotesRes.json(),
+          factsRes.json(),
+        ]);
+
+        setData({
+          jokes: jokes.jokes || [],
+          quotes: quotes.quotes || [],
+          facts: facts.facts || [],
+        });
+        setLastUpdated(new Date().toLocaleTimeString());
+      } catch (err) {
+        setError("Failed to fetch data from API");
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  };
 
   if (loading) {
     return (
@@ -101,11 +147,22 @@ export default function Home() {
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Beautiful frontend powered by Next.js and connected to Express.js backend API
             </p>
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex justify-center space-x-4">
               <div className="bg-white text-black rounded-full px-6 py-3 font-semibold">
                 ✨ Live Data from API
               </div>
+              <button 
+                onClick={handleRefresh}
+                className="bg-white text-black rounded-full px-6 py-3 font-semibold hover:bg-gray-100 transition-colors"
+              >
+                🔄 Refresh
+              </button>
             </div>
+            {lastUpdated && (
+              <p className="text-sm text-gray-400 mt-2">
+                Last updated: {lastUpdated}
+              </p>
+            )}
           </div>
         </div>
       </div>

@@ -1,6 +1,12 @@
 const express = require("express");
 const app = express();
 
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
 // Enable CORS for frontend communication
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -17,18 +23,35 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.json({ 
+    message: "Hello World!",
+    timestamp: new Date().toISOString(),
+    version: "1.0.0"
+  });
 });
 
 app.get("/jokes", (req, res) => {
-  const jokes = [
-    "Why don't scientists trust atoms? Because they make up everything!",
-    "Why did the scarecrow win an award? He was outstanding in his field!",
-    "Why don't eggs tell jokes? They'd crack each other up!",
-    "What do you call a fake noodle? An impasta!",
-    "Why did the math book look so sad? Because it had too many problems!",
-  ];
-  res.json({ jokes: jokes });
+  try {
+    const jokes = [
+      "Why don't scientists trust atoms? Because they make up everything!",
+      "Why did the scarecrow win an award? He was outstanding in his field!",
+      "Why don't eggs tell jokes? They'd crack each other up!",
+      "What do you call a fake noodle? An impasta!",
+      "Why did the math book look so sad? Because it had too many problems!",
+    ];
+    
+    // Add random selection feature
+    const limit = parseInt(req.query.limit) || jokes.length;
+    const selectedJokes = jokes.slice(0, Math.min(limit, jokes.length));
+    
+    res.json({ 
+      jokes: selectedJokes,
+      total: jokes.length,
+      returned: selectedJokes.length
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch jokes" });
+  }
 });
 
 app.get("/quotes", (req, res) => {
@@ -53,7 +76,30 @@ app.get("/facts", (req, res) => {
   res.json({ facts: facts });
 });
 
+// Add health check endpoint
+app.get("/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    version: "1.0.0"
+  });
+});
+
+// Add error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// Add 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`📊 Health check: http://localhost:${PORT}/`);
 });
