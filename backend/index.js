@@ -1,6 +1,46 @@
 const express = require("express");
 const app = express();
 
+// Simple rate limiting middleware
+const rateLimit = (() => {
+  const requests = new Map();
+  const WINDOW_MS = 60000; // 1 minute
+  const MAX_REQUESTS = 100; // 100 requests per minute
+  
+  return (req, res, next) => {
+    const clientId = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
+    
+    if (!requests.has(clientId)) {
+      requests.set(clientId, { count: 1, resetTime: now + WINDOW_MS });
+      return next();
+    }
+    
+    const clientData = requests.get(clientId);
+    
+    if (now > clientData.resetTime) {
+      clientData.count = 1;
+      clientData.resetTime = now + WINDOW_MS;
+    } else if (clientData.count >= MAX_REQUESTS) {
+      return res.status(429).json({ 
+        error: 'Too many requests', 
+        retryAfter: Math.ceil((clientData.resetTime - now) / 1000) 
+      });
+    } else {
+      clientData.count++;
+    }
+    
+    res.set('X-RateLimit-Limit', MAX_REQUESTS);
+    res.set('X-RateLimit-Remaining', Math.max(0, MAX_REQUESTS - clientData.count));
+    res.set('X-RateLimit-Reset', new Date(clientData.resetTime).toISOString());
+    
+    next();
+  };
+})();
+
+// Apply rate limiting
+app.use(rateLimit);
+
 // Add request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
